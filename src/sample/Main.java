@@ -13,7 +13,12 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
-        primaryStage.setTitle("Realm Switch");
+        if (WoW.loadWowDirectory()) {
+            primaryStage.setTitle(WoW.getWowDirectory());
+        } else {
+            primaryStage.setTitle("Press Right Click on Apply");
+        }
+
         primaryStage.setScene(new Scene(root, 374, 88));
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -21,6 +26,7 @@ public class Main extends Application {
             @Override
             public void handle(WindowEvent event) {
                 DB.saveDB();
+                WoW.saveWowDirectory();
             }
         });
     }
