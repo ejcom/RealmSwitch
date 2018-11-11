@@ -2,6 +2,9 @@ package sample;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -32,21 +35,22 @@ public class Controller extends DB {
 
     @FXML
     void initialize() {
-        if (getRealmLists().size() != 0) {
-            realmListComboBox.setItems(getRealmLists());
-        } else {
+        DB.loadDB();
+
+        realmListComboBox.setItems(FXCollections.observableArrayList(getRealmLists()));
+        if (getRealmLists().size() == 0) {
             statusLabel.setText("RealmList not found");
         }
 
         saveButton.setOnAction(event -> {
             addRealmList(realmListComboBox.getSelectionModel().getSelectedItem());
-            realmListComboBox.setItems(getRealmLists());
+            realmListComboBox.setItems(FXCollections.observableArrayList(getRealmLists()));
             statusLabel.setText("RealmList added");
         });
 
         removeButton.setOnAction(event -> {
             removeRealmList(realmListComboBox.getSelectionModel().getSelectedItem());
-            realmListComboBox.setItems(getRealmLists());
+            realmListComboBox.setItems(FXCollections.observableArrayList(getRealmLists()));
             statusLabel.setText("RealmList removed");
         });
     }

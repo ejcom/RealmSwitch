@@ -4,12 +4,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
-public abstract class DB {
-    private final ObservableList<String> realmLists = FXCollections.observableArrayList();
+public class DB {
+    private static final ArrayList<String> realmLists = new ArrayList<>();
 
 
-    public boolean saveDB() {
+    public static boolean saveDB() {
         FileOutputStream fos;
         ObjectOutputStream oos;
         try {
@@ -28,13 +30,13 @@ public abstract class DB {
         }
     }
 
-    public boolean loadDB() {
+    public static boolean loadDB() {
         FileInputStream fis;
         ObjectInputStream ois;
         try {
             fis = new FileInputStream("db.out");
             ois = new ObjectInputStream(fis);
-            realmLists.addAll((String) ois.readObject());
+            realmLists.addAll((Collection<? extends String>) ois.readObject());
             return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -48,7 +50,7 @@ public abstract class DB {
         }
     }
 
-    public ObservableList<String> getRealmLists() {
+    public ArrayList<String> getRealmLists() {
         return realmLists;
     }
 
