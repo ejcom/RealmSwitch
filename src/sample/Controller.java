@@ -4,9 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.WritableObjectValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -47,16 +46,6 @@ public class Controller extends DB {
 
     @FXML
     void initialize() {
-        DB.loadDB();
-        String importRealmList = WoW.importRealmList();
-        if (!importRealmList.equals("")) {
-            boolean addIsOK = addRealmList(importRealmList);
-            if (addIsOK) {
-                reloadComboBox();
-                statusLabel.setText("realmlist.wtf Imported");
-            } else {
-            }
-        }
 
         realmListComboBox.setItems(FXCollections.observableArrayList(getRealmLists()));
         if (getRealmLists().size() == 0) {
@@ -77,8 +66,9 @@ public class Controller extends DB {
 
         applyButton.setOnAction(event -> {
             if (!WoW.getWowDirectory().equals("")) {
-                WoW.exportRealmList(realmListComboBox.getSelectionModel().getSelectedItem());
+                WoW.saveToWoWRealmlist(realmListComboBox.getSelectionModel().getSelectedItem());
                 setSelectionItem(realmListComboBox.getSelectionModel().getSelectedIndex());
+                SaveLoadFile.save();
                 statusLabel.setText("Done");
             }
         });
@@ -87,7 +77,7 @@ public class Controller extends DB {
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.ENTER) {
-                    WoW.exportRealmList(realmListComboBox.getSelectionModel().getSelectedItem());
+                    WoW.saveToWoWRealmlist(realmListComboBox.getSelectionModel().getSelectedItem());
                     statusLabel.setText("Done");
                 }
             }
@@ -97,12 +87,20 @@ public class Controller extends DB {
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.ENTER) {
-                    WoW.exportRealmList(realmListComboBox.getSelectionModel().getSelectedItem());
+                    WoW.saveToWoWRealmlist(realmListComboBox.getSelectionModel().getSelectedItem());
                     statusLabel.setText("Done");
                 }
             }
         });
 
+        realmListComboBox.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                setSelectionItem(realmListComboBox.getSelectionModel().getSelectedIndex());
+            }
+        });
+
+        startingInitialisation();
     }
 
     @FXML
@@ -115,6 +113,12 @@ public class Controller extends DB {
         File file = directoryChooser.showDialog(stage);
         if (file != null) {
             WoW.setWowDirectory(file.getAbsolutePath());
+            String importedRealmlist = WoW.loadFromWoWRealmlist();
+            if (!importedRealmlist.equals("")) {
+                addRealmList(importedRealmlist);
+                reloadComboBox();
+                realmListComboBox.getSelectionModel().select(importedRealmlist);
+            }
         }
 
     }
@@ -127,11 +131,23 @@ public class Controller extends DB {
         return selectionItem;
     }
 
-    public static void setSelectionItem(int selectionItem) {
-        selectionItem = selectionItem;
+    public static void setSelectionItem(int currentItem) {
+        selectionItem = currentItem;
     }
 
-
+    private void startingInitialisation() {
+        SaveLoadFile.load();
+        String importFromWoW;
+        importFromWoW = WoW.loadFromWoWRealmlist();
+        if (!importFromWoW.equals("")) {
+            addRealmList(importFromWoW);
+            statusLabel.setText("RealmList found");
+        } else {
+            statusLabel.setText("WoW directory not found");
+        }
+        reloadComboBox();
+        realmListComboBox.getSelectionModel().select(selectionItem);
+    }
 }
 
 

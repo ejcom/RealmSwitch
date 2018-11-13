@@ -13,20 +13,17 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
-        if (WoW.loadWowDirectory()) {
-            primaryStage.setTitle(WoW.getWowDirectory());
-        } else {
-            primaryStage.setTitle("Press Right Click on Apply");
-        }
-
+        primaryStage.setTitle("RealmList manager by EJcom");
         primaryStage.setScene(new Scene(root, 374, 88));
         primaryStage.setResizable(false);
         primaryStage.show();
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                DB.saveDB();
-                WoW.saveWowDirectory();
+                boolean saveIsOK = SaveLoadFile.save();
+                if (saveIsOK) {
+                    SaveLoadFile.save();
+                }
             }
         });
     }
